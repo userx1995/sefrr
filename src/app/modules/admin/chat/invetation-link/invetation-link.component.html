@@ -1,0 +1,15 @@
+<!-- Header -->
+<div class="flex flex-0 items-center h-18 -mb-px">
+    <div class="ml-2 text-lg font-semibold">Copy Group Link Invitation</div>
+</div>
+
+<div class="flex">
+    <div class="bg-accent-200 rounded-lg">
+        <a class="p-2 block link-invitation" #linkValue>
+            https://www.google.com/search?gs_ssp=eJzj4tTP1TcwMU02T1JgNGB0YPBiS8_PT89JBQBASQXT&q=google&oq=goo&aqs=chrome.1.69i59j46i131i199i433i465i512j0i131i433i512j69i60l2j5j69i65l2.2249j0j9&sourceid=chrome&ie=UTF-8
+        </a>
+    </div>
+    <button class="ml-auto px-5" title="Copy link" [cdkCopyToClipboard]="linkValue.innerText" (click)="openSnackBar('link copied!')">
+        <mat-icon svgIcon="mat_solid:content_copy"></mat-icon>
+    </button>
+</div>

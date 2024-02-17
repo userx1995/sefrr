@@ -1,0 +1,465 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+// input:read-only {
+//     background-color: #f1f5f9 !important;
+//     border-color: #f1f5f9 !important;
+//     color: #000 !important;
+// }
+.w-100v {
+    width: 100% !important;
+}
+
+.w-75 {
+    width: 75% !important;
+}
+
+.w-50 {
+    width: 50% !important;
+}
+
+.w-25 {
+    width: 25% !important;
+}
+
+.chat-list-scroll {
+    max-height: 330px;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.uploader {
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    position: relative;
+
+    input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        border-radius: 50%;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        position: relative;
+        z-index: 9;
+        object-fit: cover;
+    }
+
+    .delete {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: #000;
+        top: -4px;
+        right: 5px;
+        position: absolute;
+        z-index: 999;
+
+        mat-icon {
+            color: #fff;
+            width: 18px;
+            min-width: 15px;
+        }
+    }
+
+    .content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.group-managment {
+    .uploader {
+        .delete {
+            color: #fff !important;
+            background-color: #000 !important;
+            top: 50%;
+            right: 50%;
+            transform: translate(50%, -50%);
+
+            &.mat-icon-button {
+                width: 25px;
+                height: 25px;
+                min-width: unset;
+                min-height: unset;
+            }
+        }
+    }
+}
+
+.chat-uploader {
+    position: relative;
+
+    input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+}
+
+.my-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    mat-form-field {
+        width: 48%;
+    }
+}
+
+.flex-divs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    &>div {
+        width: 48%;
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 5px;
+        }
+    }
+
+    mat-form-field {
+        width: 48%;
+    }
+}
+
+.w-houres-del {
+    border-radius: 50% !important;
+    width: 30px;
+    height: 30px;
+    min-width: 30px !important;
+    min-height: 30px;
+    padding: 0 !important;
+
+    mat-icon {
+        width: 18px;
+        height: 18px;
+        min-width: 18px;
+        min-height: 18px;
+    }
+}
+
+.mat-placeholder-required {
+    color: #dc2626 !important;
+}
+
+.password-validation {
+    margin-bottom: 15px;
+
+    span {
+        display: block;
+        font-size: 13px;
+        color: gray;
+
+        mat-icon {
+            margin-right: 5px;
+            min-width: 16px;
+            min-height: 7px;
+            width: 7px;
+            height: 7px;
+        }
+    }
+}
+
+.social-float-btn {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+
+    mat-button-base {
+        width: 30px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+
+        mat-icon {
+            color: #fff !important;
+        }
+    }
+}
+
+.model-reset-btn {
+    display: flex;
+    background-color: #d6dce4;
+    height: 100%;
+    padding: 0 10px;
+    align-items: center;
+    margin-right: -16px;
+}
+
+.link-invitation {
+    max-width: 500px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.align-base {
+    align-items: baseline;
+}
+
+.wh-70 {
+    width: 70px;
+    height: 70px;
+}
+
+@media(max-width: 992px) {
+    .wh-70 {
+        width: 60px;
+        height: 60px;
+    }
+
+    .sm-d-inline {
+        display: inline-block;
+        margin: 5px;
+    }
+
+    .uploader {
+        margin: auto;
+    }
+
+    .my-flex,
+    .flex-divs {
+        display: block;
+
+        mat-form-field,
+        &>div {
+            width: 100%;
+        }
+    }
+
+    .mat-horizontal-stepper-content {
+        &>.flex {
+            display: block !important;
+
+            .w-25,
+            .w-75 {
+                width: 100% !important;
+            }
+
+            mat-form-field {
+                width: 100%;
+            }
+        }
+    }
+
+    .mat-horizontal-stepper-header-container {
+        display: block !important;
+
+        .mat-stepper-horizontal-line {
+            margin: 0px;
+        }
+    }
+
+    app-admin-list {
+        .my-flex {
+            display: flex;
+        }
+    }
+
+    .cdk-overlay-pane {
+        width: 100vw !important;
+
+        .mat-dialog-container {
+            max-height: 80vh !important;
+        }
+    }
+
+}
+
+.max-h-400px {
+    max-height: 400px;
+}
+
+.min-h-80vh {
+    min-height: calc(100% - 150px);
+    height: calc(100vh - 210px);
+}
+
+.full-h-chat {
+    height: calc(100% - 72px);
+}
+
+.message-field {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 999;
+}
+
+.reply {
+    background-color: #fff;
+}
+
+.msgHov {
+    &:hover {
+        .replyMsgHov {
+            display: block;
+        }
+    }
+
+    .replyMsgHov {
+        display: none;
+    }
+}
+
+.mat-progress-spinner circle,
+.mat-spinner circle {
+    stroke: #24a377 !important;
+}
+
+.cdk-overlay-pane {
+    max-width: 90vw !important;
+}
+
+.working_hours_col {
+    min-width: 160px;
+    text-align: center;
+}
+
+.mobNumber {
+    position: relative;
+
+    .prefix {
+        background-color: #ececec;
+        height: 100%;
+        align-items: center;
+        display: flex;
+        padding: 0 10px;
+        margin-left: -16px;
+        border-radius: 4px;
+    }
+
+    input {
+        padding-left: 5px !important;
+    }
+}
+
+@media(max-height: 570px) {
+    .chat-list-scroll {
+        max-height: 270px;
+    }
+}
+
+@media(min-height: 740px) {
+    .chat-list-scroll {
+        max-height: 400px;
+    }
+}
+
+.admins-form-search {
+    width: 100%;
+    max-width: 550px;
+}
+
+.workinghour-hint {
+    display: flex;
+    align-items: center;
+
+    p {
+        color: #dc2626;
+        margin-right: 10px;
+        font-weight: 500;
+    }
+}
+
+.fw-bold {
+    font-weight: bold;
+    color: #000 !important;
+}
+
+.max-w-85 {
+    max-width: 85% !important;
+
+    &.msg-img {
+        max-width: 330px !important;
+    }
+
+    img {
+        width: 100%;
+        height: 50vh;
+    }
+}
+
+.underline {
+    img {
+        height: 20vh;
+    }
+}
+
+.linkDesign {
+    cursor: pointer;
+    text-decoration: underline;
+    // color: #0074cc;
+}
+
+.image-field {
+    width: 100px;
+    height: 100px;
+    margin: 10px 10px 10px 0;
+    position: relative;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+
+    button {
+        position: absolute !important;
+        top: -15px !important;
+        left: -15px !important;
+
+        mat-icon {
+            color: red;
+        }
+    }
+}
+
+textarea.resize-none {
+    // max-height: 20px !important;
+}
+
+.conversation-image-name {
+    border-top: 1px solid #aaa;
+    display: block;
+    margin-top: 10px;
+    padding-top: 5px;
+}
+
+.chat-img-popup {
+    mat-dialog-container {
+        padding: 0px !important;
+    }
+}
+
+.uploader-dialog-input {
+    padding: 10px !important;
+    width: calc(100% - 20px) !important;
+}

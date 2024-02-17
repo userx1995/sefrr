@@ -1,0 +1,68 @@
+<div class="flex flex-col flex-auto min-w-0 p-4">
+    <div class="p-6 flex gap-4">
+        <!-- Title and action buttons -->
+        <div class="flex items-center justify-between w-full">
+            <div>
+                <h2 class="text-3xl font-semibold tracking-tight leading-8">Loan # {{ data.loan?.code}}</h2>
+            </div>
+        </div>
+        <div class="flex items-center justify-between w-full">
+            <div class="flex flex-grow items-center">
+                <!-- <button class="hidden sm:inline-flex ml-3" mat-flat-button [color]="'primary'" routerLink="./new">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                    <span class="ml-2">Add School</span>
+                </button> -->
+                <mat-form-field class="w-full" [floatLabel]="'always'">
+                    <mat-label>update loan status</mat-label>
+                    <mat-select class="hidden sm:inline-flex ml-3" placeholder="loan Status"
+                        (valueChange)="updateLoanStatus($event)">
+                        <mat-option *ngFor="let item of loanStatusList" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+
+                <!-- Actions menu (visible on xs) -->
+                <!-- <div class="sm:hidden">
+                    <button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
+                        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    </button>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button mat-menu-item routerLink="./new">Add School</button>
+                    </mat-menu>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <ul class="grid grid-cols-3 gap-4">
+        <!-- Loop over data.loan object keys and values -->
+        <li *ngFor="let item of loanDataArray">
+            <p class="font-bold">{{ item[0] }}:</p>
+            <p>{{ item[1] }}</p>
+        </li>
+    </ul>
+
+    <div class="flex flex-col gap-4 mt-4">
+        <div class="flex gap-4">
+            <div class="flex flex-col gap-4">
+                <p class="font-bold">National Id (Front)</p>
+                <img [src]="data.loan.nationalIdFrontImage" alt="">
+            </div>
+            <div class="flex flex-col gap-4">
+                <p class="font-bold">National Id (Back)</p>
+                <img [src]="data.loan.nationalIdBackImage" alt="">
+            </div>
+        </div>
+        <div class="flex gap-4 mt-4">
+            <div class="flex flex-col gap-4">
+                <p class="font-bold">Driver License (Front)</p>
+                <img [src]="data.loan.drivingLicenseFrontImage" alt="">
+            </div>
+            <div class="flex flex-col gap-4">
+                <p class="font-bold">Driver License (Back)</p>
+                <img [src]="data.loan.drivingLicenseBackImage" alt="">
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,250 @@
+<!-- Tabs -->
+<mat-tab-group class="sm:p-2 sm:pt-10" [animationDuration]="'0'">
+
+    <!-- Pending -->
+    <mat-tab label="Pending">
+        <ng-template matTabContent>
+
+            <ng-container *ngIf="pendingRequests.length > 0">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 sm:mt-10">
+                    <div class="flex flex-col h-96 shadow rounded-2xl overflow-hidden bg-card"
+                        *ngFor="let request of pendingRequests">
+                        <div class="flex flex-col p-6">
+                            <div class="flex items-center justify-between">
+                                <!-- Course category -->
+                                <ng-container>
+                                    <div
+                                        class="py-0.5 px-3 rounded-full text-sm font-semibold text-blue-800 bg-blue-100 dark:text-blue-50 dark:bg-blue-500">
+                                        {{request.status}}
+                                    </div>
+                                </ng-container>
+                                <!-- Completed at least once -->
+                                <div class="flex items-center">
+                                    <div
+                                        class="p-2 text-blue-800 bg-blue-100 dark:text-blue-50 dark:bg-blue-500 rounded-full flex items-center">
+                                        {{request.school.rate}}
+                                        <mat-icon class="icon-size-4 ml-1"
+                                            [svgIcon]="'heroicons_outline:star'"></mat-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Course title & description -->
+                            <div class="mt-4 text-lg font-medium">{{request.school.name}}</div>
+                            <div class="mt-2 line-clamp-1 text-secondary" [innerHTML]="request.school.description">
+                            </div>
+                            <!-- <div class="mt-2 line-clamp-2 text-secondary">{{request.school.address}}</div> -->
+                            <div class="w-12 h-1 my-6 border-t-2"></div>
+                            <!-- Course time -->
+                            <div class="flex items-center leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint" [svgIcon]="'attach_money'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.annual_fees}}</div>
+                            </div>
+                            <!-- Course completion -->
+                            <div class="flex items-center mt-2 leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint"
+                                    [svgIcon]="'heroicons_solid:academic-cap'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.grades}}</div>
+                            </div>
+                            <!-- Course completion -->
+                            <div class="flex items-center mt-2 leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:user'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.gender}}</div>
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div class="flex flex-col w-full mt-auto">
+                            <!-- Course launch button -->
+                            <div class="px-6 py-4 text-right bg-gray-50 dark:bg-transparent">
+                                <button mat-stroked-button (click)="viewRequest(request)">
+                                    <span class="inline-flex items-center">
+                                        <span>View Request</span>
+                                        <mat-icon class="ml-1.5 icon-size-5"
+                                            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </ng-container>
+
+            <ng-container *ngIf="pendingRequests.length==0">
+                <div class="flex flex-auto flex-col items-center justify-center h-full">
+                    <mat-icon class="icon-size-24" [svgIcon]="'iconsmind:speach_bubble'"></mat-icon>
+                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">No Requests</div>
+                </div>
+            </ng-container>
+        </ng-template>
+    </mat-tab>
+
+    <!-- Accepted -->
+    <mat-tab label="Approved">
+        <ng-template matTabContent>
+            <ng-container *ngIf="acceptedRequests.length > 0">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 sm:mt-10">
+                    <div class="flex flex-col h-96 shadow rounded-2xl overflow-hidden bg-card"
+                        *ngFor="let request of acceptedRequests">
+                        <div class="flex flex-col p-6">
+                            <div class="flex items-center justify-between">
+                                <!-- Course category -->
+                                <ng-container>
+                                    <div
+                                        class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">
+                                        {{request.status}}
+                                    </div>
+                                </ng-container>
+                                <!-- Completed at least once -->
+                                <div class="flex items-center">
+                                    <div
+                                        class="p-2 text-green-600 bg-green-100 dark:text-green-50 dark:bg-green-500 rounded-full flex items-center">
+                                        {{request.school.rate}}
+                                        <mat-icon class="icon-size-4 ml-1"
+                                            [svgIcon]="'heroicons_outline:star'"></mat-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Course title & description -->
+                            <div class="mt-4 text-lg font-medium">{{request.school.name}}</div>
+                            <div class="mt-2 line-clamp-2 text-secondary" [innerHTML]="request.school.description">
+                            </div>
+                            <!-- <div class="mt-2 line-clamp-2 text-secondary">{{request.school.address}}</div> -->
+                            <div class="w-12 h-1 my-6 border-t-2"></div>
+                            <!-- Course time -->
+                            <div class="flex items-center leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint" [svgIcon]="'attach_money'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.annual_fees}}</div>
+                            </div>
+                            <!-- Course completion -->
+                            <div class="flex items-center mt-2 leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint"
+                                    [svgIcon]="'heroicons_solid:academic-cap'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.grades}}</div>
+                            </div>
+                            <!-- Course completion -->
+                            <div class="flex items-center mt-2 leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:user'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.gender}}</div>
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div class="flex flex-col w-full mt-auto">
+                            <!-- Course launch button -->
+                            <div class="px-6 py-4 text-right bg-gray-50 dark:bg-transparent">
+                                <button mat-stroked-button (click)="viewRequest(request)">
+                                    <span class="inline-flex items-center">
+                                        <span>View Request</span>
+                                        <mat-icon class="ml-1.5 icon-size-5"
+                                            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="flex items-center mt-5 ml-9" style="display: none !important;">
+
+                    <div class="flex items-center mr-3 text-md font-medium">
+                        <span>{{pageNumber}}</span>
+                        <span class="mx-1 text-secondary">of</span>
+                        <span>{{paginationObj.totalCount}}</span>
+                    </div>
+
+                    <a class="w-8 h-8 min-h-8" mat-icon-button [disabled]="pageNumber === 1">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:chevron-left'"></mat-icon>
+                    </a>
+
+                    <a class="w-8 h-8 min-h-8" mat-icon-button [disabled]="!paginationObj.hasNextPage"
+                        (click)="getRequestPagination()">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    </a>
+                </div> -->
+            </ng-container>
+
+            <ng-container *ngIf="acceptedRequests.length==0">
+                <div class="flex flex-auto flex-col items-center justify-center h-full">
+                    <mat-icon class="icon-size-24" [svgIcon]="'iconsmind:speach_bubble'"></mat-icon>
+                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">No Requests</div>
+                </div>
+            </ng-container>
+        </ng-template>
+    </mat-tab>
+
+    <!-- Denied -->
+    <mat-tab label="Rejected">
+        <ng-template matTabContent>
+            <ng-container *ngIf="deniedRequests.length > 0">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8 sm:mt-10">
+                    <div class="flex flex-col h-96 shadow rounded-2xl overflow-hidden bg-card"
+                        *ngFor="let request of deniedRequests">
+                        <div class="flex flex-col p-6">
+                            <div class="flex items-center justify-between">
+                                <!-- Course category -->
+                                <ng-container>
+                                    <div
+                                        class="py-0.5 px-3 rounded-full text-sm font-semibold text-warn-800 bg-warn-100 dark:text-warn-50 dark:bg-warn-500">
+                                        {{request.status}}
+                                    </div>
+                                </ng-container>
+                                <!-- Completed at least once -->
+                                <div class="flex items-center">
+                                    <div
+                                        class="p-2 text-warn-800 bg-warn-100 dark:text-warn-50 dark:bg-warn-500 rounded-full flex items-center">
+                                        {{request.school.rate}}
+                                        <mat-icon class="icon-size-4 ml-1"
+                                            [svgIcon]="'heroicons_outline:star'"></mat-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Course title & description -->
+                            <div class="mt-4 text-lg font-medium">{{request.school.name}}</div>
+                            <div class="mt-2 line-clamp-2 text-secondary" [innerHTML]="request.school.description">
+                            </div>
+                            <!-- <div class="mt-2 line-clamp-2 text-secondary">{{request.school.address}}</div> -->
+                            <div class="w-12 h-1 my-6 border-t-2"></div>
+                            <!-- Course time -->
+                            <div class="flex items-center leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint" [svgIcon]="'attach_money'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.annual_fees}}</div>
+                            </div>
+                            <!-- Course completion -->
+                            <div class="flex items-center mt-2 leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint"
+                                    [svgIcon]="'heroicons_solid:academic-cap'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.grades}}</div>
+                            </div>
+                            <!-- Course completion -->
+                            <div class="flex items-center mt-2 leading-5 text-md text-secondary">
+                                <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:user'"></mat-icon>
+                                <div class="ml-1.5">{{request.school.gender}}</div>
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div class="flex flex-col w-full mt-auto">
+                            <!-- Course launch button -->
+                            <div class="px-6 py-4 text-right bg-gray-50 dark:bg-transparent">
+                                <button mat-stroked-button (click)="viewRequest(request)">
+                                    <span class="inline-flex items-center">
+                                        <span>View Request</span>
+                                        <mat-icon class="ml-1.5 icon-size-5"
+                                            [svgIcon]="'heroicons_solid:arrow-sm-right'"></mat-icon>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="deniedRequests.length==0">
+                <div class="flex flex-auto flex-col items-center justify-center h-full">
+                    <mat-icon class="icon-size-24" [svgIcon]="'iconsmind:speach_bubble'"></mat-icon>
+                    <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">No Requests</div>
+                </div>
+            </ng-container>
+        </ng-template>
+    </mat-tab>
+
+</mat-tab-group>

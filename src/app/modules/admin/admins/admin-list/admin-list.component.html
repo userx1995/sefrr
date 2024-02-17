@@ -1,0 +1,194 @@
+<!-- Budget details -->
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
+        <div class="w-full max-w-screen-xl mx-auto">
+            <div class="w-full min-w-0">
+                <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden m-8">
+                    <!-- Header -->
+                    <div class="pb-0 flex flex-col gap-6">
+                        <!-- Title and action buttons -->
+                        <div class="flex items-center justify-between w-full">
+                            <div>
+                                <h2 class="text-3xl font-semibold tracking-tight leading-8">Users</h2>
+                                <div class="font-medium tracking-tight text-secondary"></div>
+                            </div>
+                            <div class="flex items-center ml-6" *ngIf="role === 'super_admin'">
+                                <button class="hidden sm:inline-flex ml-3" mat-flat-button [color]="'primary'"
+                                    (click)="openCreateUserPopup(0)">
+                                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                                    <span class="ml-2">Create New User</span>
+                                </button>
+
+
+
+                                <!-- Actions menu (visible on xs) -->
+                                <div class="sm:hidden" *ngIf="role === 'super_admin'"
+                                >
+                                    <button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
+                                        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                                    </button>
+                                    <mat-menu #actionsMenu="matMenu">
+                                        <button mat-menu-item (click)="openCreateUserPopup(0)">Create New User</button>
+                                    </mat-menu>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Search -->
+                        <form class="max-w-1/3">
+
+                            <mat-form-field class="fuse-mat-no-subscript fuse-mat-rounded fuse-mat-dense w-full"
+                                [floatLabel]="'always'">
+                                <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
+
+                                <input matInput [autocomplete]="'off'" [placeholder]="'Write Search Key to get users'"
+                                    [formControl]="searchInput">
+                            </mat-form-field>
+                        </form>
+                    </div>
+                    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+                        <table class="min-w-240 overflow-y-visible" mat-table [dataSource]="adminDataSource">
+
+                            <!-- code col -->
+                            <ng-container matColumnDef="code" sticky>
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Code
+                                </th>
+                                <td mat-cell *matCellDef="let admin">
+                                    <span class="flex items-center">
+                                        <span class="ml-3 leading-4">{{admin.code}}</span>
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <!-- username col -->
+                            <ng-container matColumnDef="username">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    User Name
+                                </th>
+                                <td mat-cell *matCellDef="let admin">
+                                    <span class="font-medium text-right">
+                                        {{admin.username}}
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <!-- name col -->
+                            <ng-container matColumnDef="name">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Name
+                                </th>
+                                <td mat-cell *matCellDef="let admin">
+                                    <span class="font-medium text-right">
+                                        {{admin.name}}
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <!-- name col -->
+                            <ng-container matColumnDef="roles">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Roles
+                                </th>
+                                <td mat-cell *matCellDef="let admin">
+                                    <div *ngIf="admin.roles?.length > 0">
+                                        <span class="text-right inline-flex items-center rounded-md bg-gray-50 px-2 py-1 m-1 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                                            <ng-container *ngFor="let role of admin.roles; let last = last">
+                                                {{ role.name }}<ng-container *ngIf="!last"> / </ng-container>
+                                            </ng-container>
+                                        </span>
+                                    </div>
+
+
+                                </td>
+                            </ng-container>
+
+                            <!-- status col -->
+                            <ng-container matColumnDef="status">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Status
+                                </th>
+                                <td mat-cell *matCellDef="let admin">
+                                    <span class="flex items-center">
+                                        <span class="w-2 h-2 rounded-full" [ngClass]="{'bg-red-500': admin.status === 'suspended',
+                                                        'bg-green-500': admin.status === 'active'}"></span>
+                                        <span class="ml-3 leading-4">{{admin.status}}</span>
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <!-- actions col -->
+                            <!-- <ng-container matColumnDef="actions">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Actions
+                                </th>
+                                <td mat-cell *matCellDef="let admin">
+                                    <div class="ml-auto -mt-2">
+                                        <button mat-icon-button [matMenuTriggerFor]="previousStatementMenu">
+                                            <mat-icon class="icon-size-5"
+                                                [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+                                        </button>
+                                        <mat-menu #previousStatementMenu="matMenu">
+                                            <button mat-menu-item (click)="viewAdminPage(admin.id)">
+                                                <span class="flex items-center">
+                                                    <mat-icon class="icon-size-5 mr-3"
+                                                        svgIcon="heroicons_outline:eye"></mat-icon>
+                                                    <span>View Details</span>
+                                                </span>
+                                            </button>
+                                            <button mat-menu-item (click)="openAdminPopup(admin)">
+                                                <span class="flex items-center">
+                                                    <mat-icon class="icon-size-5 mr-3"
+                                                        svgIcon="feather:edit"></mat-icon>
+                                                    <span>Edit</span>
+                                                </span>
+                                            </button>
+                                            <button mat-menu-item (click)="openResetPassPage(admin.id)">
+                                                <span class="flex items-center">
+                                                    <mat-icon class="icon-size-5 mr-3"
+                                                        svgIcon="heroicons_outline:refresh"></mat-icon>
+                                                    <span>Reset Password</span>
+                                                </span>
+                                            </button>
+                                            <button mat-menu-item (click)="deleteAdmin(admin)">
+                                                <span class="flex items-center">
+                                                    <mat-icon class="icon-size-5 mr-3"
+                                                        svgIcon="mat_solid:delete_outline"></mat-icon>
+                                                    <span>Delete</span>
+                                                </span>
+                                            </button>
+
+
+                                        </mat-menu>
+                                    </div>
+                                </td>
+                            </ng-container> -->
+
+                            <tr mat-header-row *matHeaderRowDef="adminColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: adminColumns;"></tr>
+                        </table>
+
+                        <!-- Pagination -->
+                        <div class="flex items-center mt-5 ml-9">
+
+                            <div class="flex items-center mr-3 text-md font-medium">
+                                <span>{{adminsPagination?.page}}</span>
+                                <span class="mx-1 text-secondary">of</span>
+                                <span>{{totalPages}}</span>
+                            </div>
+
+                            <button class="w-8 h-8 min-h-8" mat-icon-button (click)="getPrevAdmins()"
+                                [disabled]="adminsPagination?.page === 1">
+                                <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:chevron-left'"></mat-icon>
+                            </button>
+
+                            <button class="w-8 h-8 min-h-8" mat-icon-button
+                                [disabled]="adminsPagination?.page === totalPages" (click)="getNextAdmins();">
+                                <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

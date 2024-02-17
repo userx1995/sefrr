@@ -1,0 +1,150 @@
+definitions:
+  steps:
+    - step: &Build_And_Push_Step
+        name: "Build & push node app container image"
+        image: 
+          name: node:19
+        services:
+          - docker
+        script: 
+          - docker build -f Dockerfile -t admin-front .
+          - docker images
+          - pipe: atlassian/aws-ecr-push-image:1.6.2
+            variables:
+              AWS_ACCESS_KEY_ID: $PROD_AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $PROD_AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: eu-west-1 
+              TAGS: ${BITBUCKET_BUILD_NUMBER} latest
+              IMAGE_NAME: admin-front
+              
+    - step: &Dev_Build_Dist_Step
+        name: "Build Angular app dev"
+        size: 2x
+        image: node:16
+        script:
+          - npm install --force
+          - npm run build:dev
+        artifacts:
+          - dist/**
+
+    - step: &Stag_Build_Dist_Step
+        name: "Build Angular app stag"
+        size: 2x
+        image: node:16
+        script:
+          - npm install --force
+          - npm run build:stag
+        artifacts:
+          - dist/**
+
+
+    - step: &Dev_Build_And_Push_Step
+        name: "Build & push node app container image dev"
+        size: 2x
+        image: 
+          name: node:16
+        services:
+          - docker
+        script: 
+          - export DOCKER_MEMORY=4096
+          - docker build -f Dockerfile -t admin-front-dev .
+          - docker images
+          - pipe: atlassian/aws-ecr-push-image:1.6.2
+            variables:
+              AWS_ACCESS_KEY_ID: AKIASOU6P7YBYA6IBQJQ
+              AWS_SECRET_ACCESS_KEY: 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
+              AWS_DEFAULT_REGION: eu-west-1 
+              TAGS: ${BITBUCKET_BUILD_NUMBER} latest
+              IMAGE_NAME: admin-front-dev
+
+    - step: &Stag_Build_And_Push_Step
+        name: "Build & push node app container image stag"
+        image: 
+          name: node:16
+        services:
+          - docker
+        script: 
+          - docker build -f Dockerfile -t admin-front .
+          - docker images
+          - pipe: atlassian/aws-ecr-push-image:1.6.2
+            variables:
+              AWS_ACCESS_KEY_ID: $STAG_AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $STAG_AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: eu-west-1 
+              TAGS: ${BITBUCKET_BUILD_NUMBER} latest
+              IMAGE_NAME: admin-front
+
+    - step: &Deploy_To_EKS_Step
+        name: "Deploy admission service to EKS"
+        image: atlassian/default-image:2
+        deployment: Production
+        script:
+          - envsubst < k8s/admin.tpl.yaml > k8s/admin.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.0
+            variables:
+              AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: ${AWS_REGION}
+              CLUSTER_NAME: "prod"
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "k8s/admin.yaml"
+              DEBUG: "true"
+
+    - step: &Deploy_To_Dev_EKS_Step
+        name: "Deploy admin-front service to EKS"
+        image: atlassian/default-image:2
+        deployment: Dev
+        script:
+          - envsubst < k8s/dev.admin.tpl.yaml > k8s/admin.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.0
+            variables:
+              AWS_ACCESS_KEY_ID: AKIASOU6P7YBYA6IBQJQ
+              AWS_SECRET_ACCESS_KEY: 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
+              AWS_DEFAULT_REGION: "eu-west-1"
+              CLUSTER_NAME: "dev"
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "k8s/admin.yaml"
+              DEBUG: "true"
+
+    - step: &Deploy_To_Stag_EKS_Step
+        name: "Deploy admission service to EKS stag"
+        image: atlassian/default-image:2
+        deployment: Staging
+        script:
+          - envsubst < k8s/stag.admin.tpl.yaml > k8s/admin.yaml
+          - pipe: atlassian/aws-eks-kubectl-run:2.2.1
+            variables:
+              AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: ${AWS_REGION}
+              CLUSTER_NAME: "stag"
+              KUBECTL_COMMAND: "apply"
+              RESOURCE_PATH: "k8s/admin.yaml"
+              DEBUG: "true"
+              
+#    - step: &sonar-step
+#        image: node:18
+#        name: Build and SonarQube Scan
+#        caches:
+#          - node
+#        script:
+#          - npm install --force
+#          - npm install -g sonarqube-scanner
+#          - sonar-scanner -Dsonar.host.url=https://sonarqube.zeyada.org -Dsonar.token=sqa_3e3890b34beb9e9092424182db3cdfd61a7eb2f6 -Dsonar.projectKey=admin-frontend -Dsonar.projectName=admin-frontend -Dproject.settings=sonar-scanner.properties
+
+pipelines:
+  default:
+    - step: *Build_And_Push_Step
+  branches:
+    master:
+    - step: *Build_And_Push_Step
+    - step: *Deploy_To_EKS_Step
+    dev:
+#    - step: *sonar-step
+    - step: *Dev_Build_Dist_Step
+    - step: *Dev_Build_And_Push_Step
+    - step: *Deploy_To_Dev_EKS_Step
+    staging:
+    - step: *Stag_Build_Dist_Step
+    - step: *Stag_Build_And_Push_Step
+    - step: *Deploy_To_Stag_EKS_Step

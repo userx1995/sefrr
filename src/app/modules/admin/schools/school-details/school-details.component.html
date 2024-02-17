@@ -1,0 +1,199 @@
+<div class="flex flex-col flex-auto w-full">
+
+    <div class="flex flex-wrap w-full max-w-screen-md xl:max-w-screen-xl mx-auto p-6 md:p-8">
+
+        <!-- Title and action buttons -->
+        <div class="flex items-center justify-between w-full">
+            <div>
+                <h2 class="text-3xl font-semibold tracking-tight leading-8">School Details</h2>
+                <!-- <div class="font-medium tracking-tight text-secondary"></div> -->
+            </div>
+            <div class="flex items-center ml-6">
+                <!-- <button *ngIf="!isEditMode" class="hidden sm:inline-flex ml-3" mat-flat-button [color]="'primary'" -->
+                <button type="button" *ngIf="!isEditMode" class="inline-flex ml-3" mat-flat-button [color]="'primary'"
+                    (click)="toggleEditMode()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                    <span class="ml-2">Edit School</span>
+                </button>
+
+                <!-- Actions menu (visible on xs) -->
+                <!-- <div class="sm:hidden">
+                    <button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
+                        <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                    </button>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button mat-menu-item routerLink="./new">Edit School</button>
+                    </mat-menu>
+                </div> -->
+            </div>
+        </div>
+
+        <form [formGroup]="schoolForm" (ngSubmit)="onSubmit()" class="w-full mx-auto">
+
+            <div class="flex-auto flex flex-col mt-8 p-8 pb-5 bg-card rounded-2xl shadow overflow-hidden">
+                <p class="text-lg font-medium">Basic information</p>
+                <!-- <p class="text-secondary"></p> -->
+                <mat-divider class="mt-8 mb-10"></mat-divider>
+                <!-- Avatar -->
+                <div class="flex flex-auto items-center mb-6">
+                    <div *ngIf="this.isEditMode; else avatar"
+                        class="relative flex items-center justify-center w-32 h-32 rounded-full overflow-hidden ring-4 ring-bg-card">
+                        <!-- Upload / Remove avatar -->
+                        <div class="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+                        <div class="absolute inset-0 flex items-center justify-center z-20">
+                            <div>
+                                <input id="avatar-file-input"
+                                    class="absolute h-0 w-0 opacity-0 invisible pointer-events-none" type="file"
+                                    [multiple]="false" [accept]="'image/jpeg, image/png'"
+                                    (change)="uploadAvatar(avatarFileInput.files)" #avatarFileInput>
+                                <label
+                                    class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
+                                    for="avatar-file-input" matRipple>
+                                    <mat-icon class="text-white" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+                                </label>
+                            </div>
+                            <!-- <div>
+                                <button type="button" mat-icon-button (click)="removeAvatar()">
+                                    <mat-icon class="text-white" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                </button>
+                            </div> -->
+                        </div>
+                        <!-- Image/Letter -->
+                        <img class="object-cover w-full h-full" *ngIf="false" [src]="contact.avatar">
+                        <div class="flex items-center justify-center w-full h-full rounded overflow-hidden uppercase text-8xl font-bold leading-none bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                            *ngIf="true">
+                            {{school?.name?.enName?.charAt(0)}}
+                        </div>
+                    </div>
+                    <ng-template #avatar>
+                        <div
+                            class="flex items-center justify-center w-32 h-32 rounded-full overflow-hidden ring-4 ring-bg-card">
+                            <img class="object-cover w-full h-full" *ngIf="false" [src]="contact.avatar">
+                            <div class="flex items-center justify-center w-full h-full rounded overflow-hidden uppercase text-8xl font-bold leading-none bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                *ngIf="true">
+                                {{school?.name?.enName?.charAt(0)}}
+                            </div>
+                        </div>
+                    </ng-template>
+
+                </div>
+                <div formGroupName="name" class="flex flex-row gap-4 flex-auto">
+                    <!-- English Name -->
+                    <mat-form-field class="flex-auto" [floatLabel]="'always'">
+                        <mat-label>School name English</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'enName'"
+                            [placeholder]="'school name in english'" matInput required>
+                        <mat-error class="mt-2" *ngIf="nameEnControl.invalid">{{getNameEnErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                    <!-- Arabic Name -->
+                    <mat-form-field class="flex-auto" [floatLabel]="'always'">
+                        <mat-label>School name Arabic</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'arName'"
+                            [placeholder]="'اسم المدرسه بالعربيه'" matInput required>
+                        <mat-error class="mt-2" *ngIf="nameArControl.invalid">{{getNameArErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div formGroupName="address" class="flex flex-row gt-xs:flex-col gap-4">
+                    <!-- City -->
+                    <mat-form-field class="w-full" [floatLabel]="'always'">
+                        <mat-label>City</mat-label>
+                        <mat-select placeholder="Select city" [formControlName]="'cityCode'" (selectionChange)="onCitySelectionChange($event)" required>
+                            <mat-option *ngFor="let item of cities$ | async" [value]="item.code" >
+                                {{ item.multiLangName.enName }} - {{ item.multiLangName.arName }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    
+                    <!-- Areas -->
+                    <mat-form-field class="w-full" [floatLabel]="'always'">
+                        <mat-label>Area</mat-label>
+                        <mat-select placeholder="Select area" [formControlName]="'areaCode'" required>
+                            <mat-option *ngFor="let item of areas" [value]="item.code">
+                                {{ item.multiLangName.enName }} - {{ item.multiLangName.arName }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    
+
+                    <!-- Gov -->
+                    <mat-form-field class="w-full" [floatLabel]="'always'">
+                        <mat-label>Government</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'gov'" [placeholder]="'Government'" matInput
+                            required>
+                        <!-- <mat-error class="mt-2" *ngIf="nameEnControl.invalid">{{getNameEnErrorMessage()}}</mat-error> -->
+                    </mat-form-field>
+
+                    <!-- Street -->
+                    <mat-form-field class="w-full" [floatLabel]="'always'">
+                        <mat-label>Street</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'street'" [placeholder]="'Street'" matInput
+                            required>
+                        <!-- <mat-error class="mt-2" *ngIf="nameEnControl.invalid">{{getNameEnErrorMessage()}}</mat-error> -->
+                    </mat-form-field>
+
+                </div>
+                <div class="flex flex-row gt-xs:flex-col gap-4">
+                    <mat-form-field class="flex-auto" [floatLabel]="'always'">
+                        <mat-label>Total number of students</mat-label>
+                        <input type="number" [readonly]="!isEditMode" [formControlName]="'students'"
+                            [placeholder]="'ex: 10000'" matInput>
+                        <mat-error class="mt-2"
+                            *ngIf="studentsNumberControl.invalid">{{getStudentsNumberErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                    <!-- Website -->
+                    <mat-form-field class="flex-auto" [floatLabel]="'always'">
+                        <mat-label>Website</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'website'" [placeholder]="'www.example.com'"
+                            matInput required>
+                        <mat-error class="mt-2" *ngIf="websiteControl.invalid">{{getWebsiteErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div formGroupName="contact"
+                class="flex-auto flex flex-col mt-8 p-8 pb-5 bg-card rounded-2xl shadow overflow-hidden">
+                <p class="text-lg font-medium">Contact Information</p>
+                <!-- <p class="text-secondary"></p> -->
+                <mat-divider class="mt-8 mb-10"></mat-divider>
+                <div class="flex flex-wrap gap-4">
+                    <!-- Name -->
+                    <mat-form-field class="flex-auto min-w-full" [floatLabel]="'always'">
+                        <mat-label>Name</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'name'" [placeholder]="'name'" matInput>
+                        <mat-error class="mt-2" *ngIf="nameControl.invalid">{{getNameErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                    <!-- Phone Number -->
+                    <mat-form-field class="flex-auto" [floatLabel]="'always'">
+                        <mat-label>Phone Number</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'mobileNo'" [placeholder]="'01xxxxxxxxx'"
+                            matInput>
+                        <span matPrefix>+2</span>
+                        <mat-error class="mt-2" *ngIf="phoneControl.invalid">{{getPhoneErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                    <!-- Email -->
+                    <mat-form-field class="flex-auto" [floatLabel]="'always'">
+                        <mat-label>Email</mat-label>
+                        <input [readonly]="!isEditMode" [formControlName]="'email'" [placeholder]="'John@example.com'"
+                            matInput>
+                        <mat-error class="mt-2" *ngIf="emailControl.invalid">{{getEmailErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div *ngIf="isEditMode" class="flex items-center justify-end mt-10">
+                <button mat-button type="button" (click)="CancelEditSchool()">
+                    Cancel
+                </button>
+                <button type="submit" class="px-6 ml-3" mat-flat-button [color]="'primary'"
+                    [disabled]="this.schoolForm.invalid">
+                    Save
+                </button>
+            </div>
+
+        </form>
+
+        <app-parents-list *ngIf="this.schoolId" class="w-full mx-auto"></app-parents-list>
+
+    </div>
+</div>

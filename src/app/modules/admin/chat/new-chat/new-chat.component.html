@@ -1,0 +1,84 @@
+<div class="flex flex-col flex-auto h-full overflow-hidden bg-card dark:bg-default">
+
+    <!-- Header -->
+    <div class="flex flex-0 items-center h-18 -mb-px px-6 bg-gray-50 dark:bg-transparent">
+        <div class="ml-2 text-2xl font-semibold" *ngIf="type.type==='moderator'">Add Group Moderator</div>
+        <div class="ml-2 text-2xl font-semibold" *ngIf="type.type==='member'">Add Member</div>
+        <div class="ml-2 text-2xl font-semibold" *ngIf="actionType.actionType==='delete'">Delete Member</div>
+        <div class="ml-2 text-2xl font-semibold" *ngIf="actionType.actionType==='block'">Block Member</div>
+    </div>
+
+    <!-- Search -->
+    <form [formGroup]="searchForm" class="mb-2 mt-2">
+        <mat-form-field class="fuse-mat-no-subscript fuse-mat-rounded fuse-mat-dense w-full" [floatLabel]="'always'">
+            <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
+            <input matInput [autocomplete]="'off'" [formControlName]="'search_key'"
+                [placeholder]="'Write Search Key to get users'" (input)="filterChats(searchField.value)" #searchField>
+            <button class="px-8 -mr-4" mat-flat-button [color]="'primary'" (click)="getFiltered()"
+                [disabled]=" searchForm.invalid">
+                Search
+            </button>
+        </mat-form-field>
+    </form>
+    <div class="relative overflow-y-auto chat-list-scroll" (scroll)="onScroll($event)">
+        <ng-container *ngIf="contacts.length; else noContacts">
+            <ng-container *ngFor="let contact of contacts; let i = index; trackBy: trackByFn">
+                <!-- Group -->
+                <ng-container
+                    *ngIf="i === 0 || contact?.name?.toLowerCase()?.charAt(0) !== contacts[i - 1]?.name?.toLowerCase()?.charAt(0)">
+                    <div
+                        class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-100 dark:bg-gray-900">
+                        {{contact?.name?.charAt(0)}}
+                    </div>
+                </ng-container>
+                <!-- Contact -->
+                <div
+                    class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover">
+                    <mat-checkbox class="mb-2 mr-5" [color]="'primary'" (change)="select($event,i)">
+                    </mat-checkbox>
+                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+                        <ng-container *ngIf="contact.avatar">
+                            <img class="object-cover w-full h-full" [src]="contact.avatar"
+                                onerror="this.src = 'assets/images/avatars/avatar.jpg'" alt="Contact avatar" />
+                        </ng-container>
+                        <ng-container *ngIf="!contact.avatar">
+                            <div
+                                class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                                {{contact?.name?.charAt(0)}}
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="min-w-0 ml-4">
+                        <div class="font-medium leading-5 truncate">{{contact.name}}</div>
+                        <div class="leading-5 truncate text-secondary">{{contact.phone}}</div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+
+    <!-- No contacts -->
+    <ng-template #noContacts>
+        <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no contacts!</div>
+    </ng-template>
+
+
+
+</div>
+<div class="flex justify-center mt-5">
+    <button class="px-8 mx-2" mat-flat-button [color]="'warn'" type="button" (click)="closePopup()">
+        Close
+    </button>
+    <button *ngIf="actionType.actionType!=='delete'&&actionType.actionType!=='block'" (click)="assignUsers()"
+        class="px-8 mx-2" mat-flat-button [color]="'primary'" type="button">
+        Add
+    </button>
+    <button *ngIf="actionType.actionType==='delete'" (click)="deleteMember()" class="px-8 mx-2" mat-flat-button
+        [color]="'warn'" type="button">
+        Delete
+    </button>
+    <button *ngIf="actionType.actionType==='block'" (click)="blockContact()" class="px-8 mx-2" mat-flat-button
+        [color]="'warn'" type="button">
+        Block
+    </button>
+</div>

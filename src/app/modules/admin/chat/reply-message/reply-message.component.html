@@ -1,0 +1,20 @@
+<form class="p-3" [formGroup]="replyForm">
+    <div class="relative overflow-y-auto mt-4">
+        <mat-form-field class="flex-auto gt-xs:pl-3" style="width: 100%;">
+            <textarea matInput [formControlName]="'message'" [placeholder]="'your reply'" [rows]="4" required>
+            </textarea>
+            <mat-error>
+                Field is required
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div class="flex justify-end mt-8">
+        <button class="px-8 mr-2" mat-flat-button [color]="'accent'" type="button" (click)="closePopup()">
+            Close
+        </button>
+        <button class="px-8" mat-flat-button [color]="'primary'" type="submit" (click)="sendReply()"
+            [disabled]="replyForm.invalid">
+            Reply
+        </button>
+    </div>
+</form>

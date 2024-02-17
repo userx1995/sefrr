@@ -1,0 +1,80 @@
+<div class="flex flex-col flex-auto md:w-160 md:min-w-160 -m-6">
+    <form class="flex flex-col w-full p-8" [formGroup]="filtersForm">
+        <div>
+            <div class="my-flex">
+                <mat-form-field>
+                    <mat-label>Age</mat-label>
+                    <input matInput type="number" [formControlName]="'age'">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Gender</mat-label>
+                    <mat-select [formControlName]="'gender'">
+                        <mat-option value="male">Male</mat-option>
+                        <mat-option value="female">Female</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="my-flex">
+                <mat-form-field>
+                    <mat-label>Class</mat-label>
+                    <input matInput [formControlName]="'class'">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Stage</mat-label>
+                    <input matInput [formControlName]="'stage'">
+                </mat-form-field>
+            </div>
+
+            <div class="my-flex">
+                <mat-form-field>
+                    <mat-label>School</mat-label>
+                    <input matInput [formControlName]="'school'">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>District</mat-label>
+                    <input matInput [formControlName]="'district'">
+                </mat-form-field>
+            </div>
+
+            <div class="my-flex">
+                <mat-form-field>
+                    <mat-label>Parents of Classes</mat-label>
+                    <input matInput [formControlName]="'parentClasses'">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Educational Administration </mat-label>
+                    <input matInput [formControlName]="'education'">
+                </mat-form-field>
+            </div>
+
+            <div class="my-flex">
+                <mat-form-field>
+                    <mat-label>Governate </mat-label>
+                    <mat-select [formControlName]="'governate'">
+                        <mat-option value="cairo">Cairo</mat-option>
+                        <mat-option value="giza">Giza</mat-option>
+                        <mat-option value="alex">Alex</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+        </div>
+
+        <div class="flex items-center justify-between w-full border-t px-8 py-4">
+            <button
+                class="mr-4"
+                mat-button
+                [color]="'warn'">
+                Reset
+            </button>
+            <button
+                mat-flat-button
+                [color]="'primary'"
+                (click)="applyFilters()">
+                Apply
+            </button>
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,65 @@
+<div class="mt-5 uploader-dialog">
+    <form [formGroup]="uploadForm">
+        <ng-container *ngIf="uploadedFile?.url?.length <= 0">
+            <div class="text-center">
+                <label>Upload File</label>
+                <div
+                    class="m-auto h-120px flex flex-col items-center justify-center w-56 rounded-lg cursor-pointer border-2 border-gray-300 border-dashed hover:bg-hover transition-colors duration-150 ease-in-out">
+                    <mat-icon class="icon-size-12 text-hint" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    <input class="upliader" type="file" [formControlName]="'file'"
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        (change)="uploadFile($event)" required>
+                </div>
+                <p class="text-gray-400 mt-4 text-[10px] sm:text-sm">CSV , XLXS files is allowed.</p>
+
+            </div>
+        </ng-container>
+        <ng-container *ngIf="uploadedFile?.url?.length > 0">
+            <div class="w-full flex items-center justify-center">
+
+                <div class="flex flex-col w-40 h-40 m-2 p-4 shadow rounded-2xl cursor-pointer bg-card">
+                    <button class="absolute z-20 top-1.5 right-1.5 w-8 h-8 min-h-8" (click)="removeFile()"
+                        mat-icon-button>
+                        <mat-icon class="icon-size-5 text-red" [svgIcon]="'feather:x-circle'"></mat-icon>
+                    </button>
+                    <div class="aspect-w-9 aspect-h-6">
+                        <div class="flex items-center justify-center">
+                            <div class="relative">
+                                <mat-icon class="icon-size-14 text-hint" [svgIcon]="'iconsmind:file'"></mat-icon>
+                                <!-- <div
+                                class="absolute left-0 bottom-0 px-1.5 rounded text-sm font-semibold leading-5 text-white bg-red-600">
+                                {{uploadedFile.type.toUpperCase()}}
+                            </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-auto justify-center text-center text-sm font-medium">
+                        <div class="truncate">{{uploadedFile.name}}</div>
+                    </div>
+                </div>
+            </div>
+
+        </ng-container>
+
+        <div class="flex inputs items-center justify-center">
+            <mat-form-field>
+                <mat-select placeholder="Select Type" [formControlName]="'type'" required>
+                    <ng-container *ngFor="let userType of userTypes">
+                        <mat-option [value]="userType">{{userType}}</mat-option>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="flex justify-center mt-5">
+            <button class="px-8 mx-2" mat-flat-button [color]="'warn'" type="button" (click)="closePopup()">
+                Close
+            </button>
+            <button class="px-8" mat-flat-button [color]="'primary'"
+                [disabled]="uploadForm.invalid || fileTypeError || !uploadForm.get('type').value" type="button"
+                (click)="upload()">
+                Upload
+            </button>
+        </div>
+    </form>
+</div>

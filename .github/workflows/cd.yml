@@ -1,0 +1,372 @@
+name: CD Run
+
+on:
+  push:
+    branches:
+      - dev
+      - staging
+      - main
+env:
+  DEV_EKS_CLUSTER: dev
+  STAG_EKS_CLUSTER: stag
+  PROD_EKS_CLUSTER: prod
+  EKS_REGION: eu-west-1
+  IMAGE_TAG: ${{ github.run_number }}
+
+jobs:
+
+  build_artifact_dev:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/dev' }}
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+
+    - name: Build-dev
+      run: npm install --force
+
+    - name: run
+      run:  npm run build:dev
+
+    - name: Delete Old Artifacts
+      uses: actions/github-script@v6
+      id: artifact
+      with:
+        script: |
+          const res = await github.rest.actions.listArtifactsForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          })
+
+          res.data.artifacts
+            .forEach(({ id }) => {
+              github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: id,
+              })
+            })
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist
+
+  Dev_Build_And_Push_Step:
+    runs-on: ubuntu-latest
+    needs: [build_artifact_dev]
+    if: ${{ github.ref == 'refs/heads/dev' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.EKS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Download a single artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+
+    - name: List Files in Distribution Directory
+      run: |
+        cd /home/runner/work/admin-frontend/admin-frontend
+
+    - name: Build, tag, and push the image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: admin-front-dev
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+      run: |
+        sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+        sudo systemctl restart docker
+        # Build a docker container and push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg ENV_CONFIG=dev .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest --build-arg ENV_CONFIG=dev .
+        echo "Pushing image to ECR..."
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_OUTPUT
+
+  build_artifact_stag:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/staging' }}
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+
+    - name: Build-dev
+      run: npm install --force
+
+    - name: run
+      run:  npm run build:stag
+
+    - name: Delete Old Artifacts
+      uses: actions/github-script@v6
+      id: artifact
+      with:
+        script: |
+          const res = await github.rest.actions.listArtifactsForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          })
+
+          res.data.artifacts
+            .forEach(({ id }) => {
+              github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: id,
+              })
+            })
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist
+
+
+  Stag_Build_And_Push_Step:
+    runs-on: ubuntu-latest
+    needs: [build_artifact_stag]
+    if: ${{ github.ref == 'refs/heads/staging' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.EKS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Download a single artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+
+    - name: List Files in Distribution Directory
+      run: |
+        cd /home/runner/work/admin-frontend/admin-frontend
+
+    - name: Build, tag, and push the image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: admin-front-stag
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+      run: |
+       sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+       sudo systemctl restart docker
+        # Build a docker container and push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  --build-arg ENV_CONFIG=stag .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest  --build-arg ENV_CONFIG=stag .
+        echo "Pushing image to ECR..."
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_OUTPUT
+
+  build_artifact_prod:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+
+    - name: Build-dev
+      run: npm install --force
+
+    - name: run
+      run:  npm run build:prod
+
+    - name: Delete Old Artifacts
+      uses: actions/github-script@v6
+      id: artifact
+      with:
+        script: |
+          const res = await github.rest.actions.listArtifactsForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          })
+
+          res.data.artifacts
+            .forEach(({ id }) => {
+              github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: id,
+              })
+            })
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist
+
+
+  Prod_Build_And_Push_Step:
+    runs-on: ubuntu-latest
+    needs: [build_artifact_prod]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.EKS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Download a single artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+
+    - name: List Files in Distribution Directory
+      run: |
+        cd /home/runner/work/admin-frontend/admin-frontend
+
+    - name: Build, tag, and push the image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: admin-front-prod
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+      run: |
+        sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+        sudo systemctl restart docker
+        # Build a docker container and push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  --build-arg ENV_CONFIG=prod .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest --build-arg ENV_CONFIG=prod .
+        echo "Pushing image to ECR..."
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_OUTPUT
+
+
+  Dev_Deploy_To_Eks:
+    runs-on: ubuntu-latest
+    needs: [Dev_Build_And_Push_Step]
+    if: ${{ github.ref == 'refs/heads/dev' }}
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v2
+
+      # Deploy the Docker image to the EKS cluster
+      - name: Configure access to EKS cluster
+        run: |-
+          aws --version
+          aws configure set aws_access_key_id ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ env.EKS_REGION }}
+          aws sts get-caller-identity
+
+      - name: Deploy to EKS
+        run: |
+          aws eks --region ${{env.EKS_REGION}} update-kubeconfig --name ${{env.DEV_EKS_CLUSTER}}
+
+      - name: Taggig
+        run: |
+          echo "imageTag=${{ github.run_number }}" >> $GITHUB_ENV
+      - name: Render k8s manifests
+        run: envsubst < k8s/dev.admin.tpl.yaml > deployment.yml
+      - run: kubectl apply -f ./deployment.yml
+
+  Stag_Deploy_To_Eks:
+    runs-on: ubuntu-latest
+    needs: [Stag_Build_And_Push_Step]
+    if: ${{ github.ref == 'refs/heads/staging' }}
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v2
+
+      # Deploy the Docker image to the EKS cluster
+      - name: Configure access to EKS cluster
+        run: |-
+          aws --version
+          aws configure set aws_access_key_id ${{ secrets.STAG_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.STAG_AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ env.EKS_REGION }}
+          aws sts get-caller-identity
+
+      - name: Deploy to EKS
+        run: |
+          aws eks --region ${{env.EKS_REGION}} update-kubeconfig --name ${{env.STAG_EKS_CLUSTER}}
+
+      - name: Taggig
+        run: |
+          echo "imageTag=${{ github.run_number }}" >> $GITHUB_ENV
+      - name: Render k8s manifests
+        run: envsubst < k8s/stag.admin.tpl.yaml > deployment.yml
+      - run: kubectl apply -f ./deployment.yml
+
+  Prod_Deploy_To_Eks:
+    runs-on: ubuntu-latest
+    needs: [Prod_Build_And_Push_Step]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v2
+
+      # Deploy the Docker image to the EKS cluster
+      - name: Configure access to EKS cluster
+        run: |-
+          aws --version
+          aws configure set aws_access_key_id ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ env.EKS_REGION }}
+          aws sts get-caller-identity
+
+      - name: Deploy to EKS
+        run: |
+          aws eks --region ${{env.EKS_REGION}} update-kubeconfig --name ${{env.PROD_EKS_CLUSTER}}
+
+      - name: Taggig
+        run: |
+          echo "imageTag=${{ github.run_number }}" >> $GITHUB_ENV
+      - name: Render k8s manifests
+        run: envsubst < k8s/dev.admin.tpl.yaml > deployment.yml
+
+      - name: Taggig
+        run: |
+          echo "imageTag=${{ github.run_number }}" >> $GITHUB_ENV
+      - name: Render k8s manifests
+        run: envsubst < k8s/admin.tpl.yaml > deployment.yml
+      - run: kubectl apply -f ./deployment.yml
+

@@ -1,0 +1,44 @@
+<form [formGroup]="workingHour">
+    <div
+        class="lg:grid grid-flow-row auto-rows-fr lg:grid-flow-col lg:auto-cols-fr divide-y lg:divide-y-0 lg:divide-x border">
+        <div class="working_hours_col" formArrayName="working_hours"
+            *ngFor="let day of days.controls; let dayIndex = index">
+            <div class="font-bold text-center p-2">{{day.value.day }}</div>
+            <div class="border p-2" [formGroupName]="dayIndex" *ngIf="schedule(dayIndex).controls.length > 0">
+                <div class="p-2 my-2 shadow rounded-2xl bg-gray-100 text-center sm-d-inline" formArrayName="schedule"
+                    *ngFor="let hour of schedule(dayIndex).controls; let hourIndex = index ">
+                    <button class="w-houres-del" [color]="'warn'" (click)="deletFromToGroup(dayIndex,hourIndex)"
+                        mat-flat-button><mat-icon svgIcon="mat_outline:delete"></mat-icon></button>
+                    <div class="flex align-base" [formGroupName]="hourIndex">
+                        <span class="mr-2 w-10">From</span>
+                        <input matInput type="time" formControlName="from" (change)="checkFromTo(dayIndex,hourIndex)">
+                    </div>
+                    <div class="flex align-base" [formGroupName]="hourIndex">
+                        <span class="mr-2 w-10">To</span>
+                        <input matInput type="time" formControlName="to" (change)="checkFromTo(dayIndex,hourIndex)">
+                    </div>
+                </div>
+
+            </div>
+            <div class="flex items-center justify-center p-2">
+                <button class="px-6 text-secondary bg-default" mat-flat-button (click)="addFromToGroup(dayIndex)">Add
+                    more</button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div class="flex justify-center mt-5">
+    <button class="px-8 mx-2" mat-flat-button [color]="'warn'" type="button" (click)="closePopup()">
+        Close
+    </button>
+    <button class="px-8 mx-2" mat-flat-button [color]="'primary'" [disabled]="workingHour.invalid" (click)="submit()"
+        type="button" *ngIf="!isUpdateWorkingHours || isAdd">
+        Apply
+    </button>
+    <button class="px-8 mx-2" mat-flat-button [color]="'primary'" [disabled]="workingHour.invalid"
+        (click)="updateGroup()" type="button" *ngIf="isUpdateWorkingHours && !isAdd">
+        Update
+    </button>
+</div>

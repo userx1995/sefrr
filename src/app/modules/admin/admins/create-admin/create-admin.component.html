@@ -1,0 +1,140 @@
+<div class="flex flex-col flex-auto min-w-0 p-4">
+    <form [formGroup]="newAdminForm">
+        <div class="my-flex mb-6">
+            <div *ngIf="!editMode" class="text-3xl font-semibold tracking-tight leading-8">Add New Admin</div>
+            <div *ngIf="editMode" class="text-3xl font-semibold tracking-tight leading-8">Edit Admin</div>
+        </div>
+        <div class="flex flex-col gt-xs:flex-row">
+
+            <div class="my-flex">
+
+                <mat-form-field>
+                    <mat-label>First Name</mat-label>
+                    <input matInput type="text" [placeholder]="'First Name'" [formControlName]="'first_name'"
+                        [readonly]="editMode ? true : false" required>
+                    <mat-error>
+                        Field is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Last Name</mat-label>
+                    <input matInput type="text" [formControlName]="'last_name'" [placeholder]="'Last Name'"
+                        [readonly]="editMode ? true : false" required>
+                    <mat-error>
+                        Field is required
+                    </mat-error>
+                </mat-form-field>
+
+            </div>
+            <div class="flex-divs">
+                <!-- <div>
+                    <label>Image</label>
+                    <div class="uploader">
+                        <button *ngIf="imageUrl" class="delete" (click)="removeAvatar()"><mat-icon svgIcon="heroicons_outline:x"></mat-icon></button>
+                        <img [src]="imageUrl" *ngIf="imageUrl" alt="name">
+                        <input type="file" [formControlName]="'image'" (change)="uploadAvatar($event)" #imageFileInput>
+                        <div class="content" *ngIf="!imageUrl">
+                            <mat-icon svgIcon="heroicons_outline:upload"></mat-icon>
+                            Upload admin image
+                        </div>
+                    </div>
+                </div> -->
+                <mat-form-field>
+                    <mat-label>User Name</mat-label>
+                    <input matInput type="text" [placeholder]="'User Name'" autocomplete="new-password"
+                        [formControlName]="'username'" required>
+                    <mat-error>
+                        Field is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" [formControlName]="'password'" required #passwordField
+                        [readonly]="editMode ? true : false" autocomplete="new-password">
+                    <button type="button" class="model-reset-btn" (click)="openResetPassPage()" *ngIf="editMode">
+                        <mat-icon class="icon-size-5 mr-1" [svgIcon]="'mat_solid:refresh'"></mat-icon>
+                        Reset
+                    </button>
+                    <button mat-icon-button type="button" *ngIf="!editMode"
+                        (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                        matSuffix>
+                        <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'password'"
+                            [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                        <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'text'"
+                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                    </button>
+                    <mat-error *ngIf="adminForm.password.errors?.required">
+                        Field is required
+                    </mat-error>
+                    <mat-error *ngIf="adminForm.password.errors?.minlength">
+                        The password cannot be less than 8 letters
+                    </mat-error>
+                    <mat-error *ngIf="adminForm.password.errors?.pattern">
+                        The password must contain large, small letters and symbols
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+
+            <div class="my-flex">
+                <mat-form-field>
+                    <mat-label>Governorate</mat-label>
+                    <mat-select [formControlName]="'governorate'" [placeholder]="'governorate'"
+                        [disabled]="editMode ? true : false">
+                        <mat-option *ngFor="let governorate of governorates"
+                            [value]="governorate.name">{{governorate.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="mobNumber">
+                    <mat-label>Mobile Number</mat-label>
+                    <span class="prefix">+20</span>
+                    <input [readonly]="editMode ? true : false" matInput type="number"
+                        [formControlName]="'phone_number'" [placeholder]="'010000000'" required>
+                    <mat-error *ngIf="newAdminForm.get('phone_number').hasError('required')">
+                        Field is required
+                    </mat-error>
+                    <mat-error *ngIf="newAdminForm.get('phone_number').invalid">
+                        Phone Number not valid
+                    </mat-error>
+
+                </mat-form-field>
+
+            </div>
+
+
+            <div class="my-flex">
+
+
+                <!-- <mat-form-field>
+                    <mat-label>District</mat-label>
+                    <mat-select
+                        [formControlName]="'district'"
+                        [placeholder]="'district'"
+                        required>
+                        <mat-option value="district-1">Country 1</mat-option>
+                        <mat-option value="district-2">Country 2</mat-option>
+                        <mat-option value="district-3">Country 3</mat-option>
+                    </mat-select>
+                    <mat-error>
+                        Field is required
+                    </mat-error>
+                </mat-form-field> -->
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button class="px-8 mx-2" mat-flat-button [color]="'warn'" type="button" (click)="closePopup()">
+                Close
+            </button>
+            <button class="px-8" mat-flat-button [color]="'primary'" (click)="createAdmin()" *ngIf="!editMode"
+                [disabled]=" newAdminForm.invalid" type="button">
+                Create
+            </button>
+            <button class="px-8" mat-flat-button [color]="'primary'" (click)="updateAdmin()" *ngIf="editMode"
+                [disabled]="newAdminForm.invalid" type="button">
+                Update
+            </button>
+        </div>
+    </form>
+</div>
